@@ -56,7 +56,7 @@
     <div class="container mx-auto p-4 sm:p-8 max-w-7xl">
 
         <section id="hook" class="text-center mb-16 pt-8">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-[#0B4C6F] mb-4">
+            <h1 class="4xl md:text-5xl font-extrabold text-[#0B4C6F] mb-4">
                 Battling an Organizational F.I.R.E.S.T.O.R.M.?
             </h1>
             <h2 class="text-2xl md:text-3xl font-semibold text-[#077187] mb-6">
@@ -241,7 +241,7 @@
                         <span><span class="font-bold">Create Radical Visibility</span> with shared data.</span>
                     </li>
                     <li class="flex items-center text-lg text-gray-700">
-                        <span class="text-3xl text-[#2FB8B5] mr-4 font-bold">&#x2713;</span>
+                        <span class="3xl text-[#2FB8B5] mr-4 font-bold">&#x2713;</span>
                         <span><span class="font-bold">Install an Operating Rhythm</span> for cadence.</span>
                     </li>
                     <li class="flex items-center text-lg text-gray-700">
@@ -455,7 +455,8 @@
                 titleDiv.classList.add('hidden');
                 indicator.classList.remove('hidden');
 
-                const apiKey = ""; 
+                // API Key inserted here
+                const apiKey = "AIzaSyCK7hjJTXgwEKwzQ2Grmc1FTyGROVWTKSU"; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const systemPrompt = "You are a world-class organizational consultant specializing in business scaling. Provide a concise, 3-step action plan to solve the stated pain point. Format the response strictly as an HTML ordered list (`<ol class=\"list-decimal ml-5 space-y-3\"><li>...</li></ol>`) with bold action titles and detailed descriptions. Do not include any introductory or concluding text outside the list. Ensure that list items use proper HTML structure (e.g., <b>Action Title:</b> Detailed description).";
@@ -507,7 +508,8 @@
                 const originalText = ttsButton.innerHTML;
                 ttsButton.innerHTML = '&#x1F50A; Narrating...';
 
-                const apiKey = "";
+                // API Key inserted here
+                const apiKey = "AIzaSyCK7hjJTXgwEKwzQ2Grmc1FTyGROVWTKSU";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
 
                 const payload = {
