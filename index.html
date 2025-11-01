@@ -80,22 +80,12 @@
                     <p class="text-lg text-gray-700 mt-6">
                         The entire operation is bottlenecked by the founder, whose sign-off is required for nearly all major decisions. <span class="font-bold block mt-2">(The Root Cause)</span>
                     </p>
-                    <button id="generateActionPlanBtn" class="mt-6 px-6 py-3 bg-[#2FB8B5] text-white font-bold rounded-full hover:bg-[#077187] transition duration-300 shadow-md">
-                        ✨ Generate Dependency Action Plan
-                    </button>
+                    <!-- Removed: Generate Dependency Action Plan button -->
                 </div>
             </div>
         </section>
 
-        <section id="llm-output" class="mb-16">
-            <h3 id="planTitle" class="text-3xl font-bold text-center text-[#0B4C6F] mb-4 hidden">Generated Action Plan</h3>
-            <div id="loadingIndicator" class="hidden text-center text-lg font-semibold text-[#077187]">
-                Analyzing your system...
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#077187] mx-auto mt-4"></div>
-            </div>
-            <div id="actionPlanResults" class="bg-white rounded-lg shadow-lg p-6 max-w-3xl mx-auto border-l-4 border-[#2FB8B5] hidden">
-            </div>
-        </section>
+        <!-- Removed: LLM output section -->
 
         <section id="symptoms" class="mb-16">
             <h3 class="text-3xl font-bold text-center text-[#0B4C6F] mb-4">The 9 Critical Symptoms</h3>
@@ -223,9 +213,7 @@
         <section id="solution" class="mb-16">
             <div class="flex items-center justify-center mb-4">
                 <h3 class="text-3xl font-bold text-center text-[#0B4C6F]">Moving from Chaos to Clarity</h3>
-                <button id="ttsButton" class="ml-4 px-3 py-1 bg-[#68D2C2] text-[#0B4C6F] font-bold rounded-full hover:bg-[#2FB8B5] transition duration-300 shadow-sm text-sm flex items-center">
-                    &#x1F50A; Narrate Solutions
-                </button>
+                <!-- Removed: Narrate Solutions button -->
             </div>
             <p class="text-lg text-gray-700 max-w-3xl mx-auto text-center mb-10">
                 Solving the F.I.R.E.S.T.O.R.M. isn't about tackling one symptom at a time. It's about implementing a new, scalable operating system. The solution is to reverse the pain points.
@@ -375,199 +363,8 @@
                     options: radarOptions
                 });
             }
-
             
-            function base64ToArrayBuffer(base64) {
-                const binaryString = atob(base64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                return bytes.buffer;
-            }
-
-            function pcmToWav(pcm16, sampleRate) {
-                const buffer = new ArrayBuffer(44 + pcm16.byteLength);
-                const view = new DataView(buffer);
-                let offset = 0;
-
-                function writeString(s) {
-                    for (let i = 0; i < s.length; i++) {
-                        view.setUint8(offset + i, s.charCodeAt(i));
-                    }
-                    offset += s.length;
-                }
-
-                writeString('RIFF');
-                view.setUint32(offset, 36 + pcm16.byteLength, true); offset += 4;
-                writeString('WAVE');
-                writeString('fmt ');
-                view.setUint32(offset, 16, true); offset += 4;
-                view.setUint16(offset, 1, true); offset += 2;
-                view.setUint16(offset, 1, true); offset += 2;
-                view.setUint32(offset, sampleRate, true); offset += 4;
-                view.setUint32(offset, sampleRate * 2, true); offset += 4;
-                view.setUint16(offset, 2, true); offset += 2;
-                view.setUint16(offset, 16, true); offset += 2;
-                writeString('data');
-                view.setUint32(offset, pcm16.byteLength, true); offset += 4;
-                
-                const pcmDataView = new DataView(pcm16.buffer);
-                for (let i = 0; i < pcm16.byteLength; i++) {
-                    view.setUint8(offset + i, pcmDataView.getUint8(i));
-                }
-
-                return new Blob([buffer], { type: 'audio/wav' });
-            }
-
-            async function exponentialBackoffFetch(url, options, maxRetries = 5) {
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        const response = await fetch(url, options);
-                        if (response.ok) {
-                            return response;
-                        }
-                        if (response.status === 429 && i < maxRetries - 1) {
-                            const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                        } else {
-                            throw new Error(`API call failed with status: ${response.status}`);
-                        }
-                    } catch (error) {
-                        if (i === maxRetries - 1) {
-                            throw error;
-                        }
-                        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                    }
-                }
-            }
-
-
-            async function callGeminiActionPlan(painPoint) {
-                const indicator = document.getElementById('loadingIndicator');
-                const resultsDiv = document.getElementById('actionPlanResults');
-                const titleDiv = document.getElementById('planTitle');
-                
-                resultsDiv.innerHTML = '';
-                resultsDiv.classList.add('hidden');
-                titleDiv.classList.add('hidden');
-                indicator.classList.remove('hidden');
-
-                // API Key inserted here
-                const apiKey = "AIzaSyCK7hjJTXgwEKwzQ2Grmc1FTyGROVWTKSU"; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-                const systemPrompt = "You are a world-class organizational consultant specializing in business scaling. Provide a concise, 3-step action plan to solve the stated pain point. Format the response strictly as an HTML ordered list (`<ol class=\"list-decimal ml-5 space-y-3\"><li>...</li></ol>`) with bold action titles and detailed descriptions. Do not include any introductory or concluding text outside the list. Ensure that list items use proper HTML structure (e.g., <b>Action Title:</b> Detailed description).";
-                const userQuery = `Generate a 3-step action plan to mitigate the organizational pain point: ${painPoint}.`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                };
-
-                try {
-                    const response = await exponentialBackoffFetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                    if (text && text.includes('<ol')) {
-                        resultsDiv.innerHTML = text;
-                        resultsDiv.classList.remove('hidden');
-                        titleDiv.classList.remove('hidden');
-                    } else {
-                        resultsDiv.innerHTML = `<p class="text-red-600">Failed to generate a structured plan. The core issue is complex. Try refining the prompt.</p>`;
-                        resultsDiv.classList.remove('hidden');
-                    }
-
-                } catch (error) {
-                    resultsDiv.innerHTML = `<p class="text-red-600">Error during API call: ${error.message}</p>`;
-                    resultsDiv.classList.remove('hidden');
-                } finally {
-                    indicator.classList.add('hidden');
-                }
-            }
-
-            async function callGeminiTTS() {
-                const ttsButton = document.getElementById('ttsButton');
-                const solutionList = document.getElementById('solutionList');
-                const listItems = solutionList.querySelectorAll('li span:last-child');
-                
-                let textToSpeak = 'The solution to the F.I.R.E.S.T.O.R.M. is to reverse the pain points.';
-                
-                listItems.forEach((item, index) => {
-                    textToSpeak += ` Point ${index + 1}: ${item.innerText.trim()}.`;
-                });
-
-                ttsButton.disabled = true;
-                const originalText = ttsButton.innerHTML;
-                ttsButton.innerHTML = '&#x1F50A; Narrating...';
-
-                // API Key inserted here
-                const apiKey = "AIzaSyCK7hjJTXgwEKwzQ2Grmc1FTyGROVWTKSU";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{
-                        parts: [{ text: textToSpeak }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName: "Kore" }
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-
-                try {
-                    const response = await exponentialBackoffFetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    const part = result?.candidates?.[0]?.content?.parts?.[0];
-                    const audioData = part?.inlineData?.data;
-                    const mimeType = part?.inlineData?.mimeType;
-
-                    if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
-                        const sampleRateMatch = mimeType.match(/rate=(\d+)/);
-                        if (!sampleRateMatch) throw new Error("Could not determine sample rate from mimeType.");
-                        const sampleRate = parseInt(sampleRateMatch[1], 10);
-                        
-                        const pcmData = base64ToArrayBuffer(audioData);
-                        const pcm16 = new Int16Array(pcmData);
-                        const wavBlob = pcmToWav(pcm16, sampleRate);
-                        
-                        const audioUrl = URL.createObjectURL(wavBlob);
-                        const audio = new Audio(audioUrl);
-                        audio.play().catch(e => console.error("Audio playback failed:", e));
-
-                    } else {
-                        console.error("TTS API response was missing audio data or had an unexpected format.");
-                    }
-
-                } catch (error) {
-                    console.error("TTS API call error:", error);
-                } finally {
-                    ttsButton.innerHTML = originalText;
-                    ttsButton.disabled = false;
-                }
-            }
-            
-            document.getElementById('generateActionPlanBtn').addEventListener('click', () => {
-                callGeminiActionPlan("Founder Dependency and its resulting lack of organizational structure");
-            });
-
-            document.getElementById('ttsButton').addEventListener('click', callGeminiTTS);
+            // Removed: All Gemini API helper functions and event listeners
         });
     </script>
 </body>
